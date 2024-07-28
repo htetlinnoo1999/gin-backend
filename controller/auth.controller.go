@@ -62,14 +62,15 @@ func (controller *AuthController) Login(ctx *gin.Context) {
 		return
 	}
 	token, jwtErr := controller.authService.Login(loginRequest)
+	ctx.SetCookie("access_token", token, 3600, "/", "localhost", true, true)
 	if jwtErr != nil {
 		ctx.JSON(http.StatusUnauthorized, response.Response{
 			Code:   http.StatusUnauthorized,
 			Status: "Fail",
-			Data:   jwtErr,
+			Data:   jwtErr.Error(),
 		})
+		return
 	}
-	ctx.SetCookie("access_token", token, 3600, "/", "localhost", true, true)
 	ctx.JSON(http.StatusOK, response.Response{
 		Code:   http.StatusOK,
 		Status: "Ok",
